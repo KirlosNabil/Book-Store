@@ -1,6 +1,8 @@
 ﻿using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Models;
+using Bulky.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BulkyWeb.Areas.Admin.Controllers
 {
@@ -17,46 +19,45 @@ namespace BulkyWeb.Areas.Admin.Controllers
             List<Product> ProductList = _UnitOfWork.Product.GetAll().ToList();
             return View(ProductList);
         }
-        public IActionResult Create()
+        public IActionResult Upsert(int? Id)
         {
-            return View();
-        }
+            ProductVM productVM = new()
+            {
+                CategoryList = _UnitOfWork.Category.GetAll().Select(
+				u => new SelectListItem
+				{
+					Text = u.Name,
+					Value = u.Id.ToString(),
+				}
+			    ),
+                Product = new Product()
+            };
+            if(Id != null && Id != 0)
+            {
+                productVM.Product = _UnitOfWork.Product.Get(u=> u.Id==Id);
+			}
+			return View(productVM);
+		}
         [HttpPost]
-        public IActionResult Create(Product newProduct)
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                _UnitOfWork.Product.Add(newProduct);
+                _UnitOfWork.Product.Add(productVM.Product);
                 _UnitOfWork.Save();
                 TempData["success"] = "Product created successfully!";
                 return RedirectToAction("Index");
             }
-            return View();
-        }
-        public IActionResult Edit(int Id)
-        {
-            if (Id == 0)
+            else
             {
-                return NotFound();
-            }
-            Product ProductToBeEdited = _UnitOfWork.Product.Get(u => u.Id == Id);
-            if (ProductToBeEdited == null)
-            {
-                return NotFound();
-            }
-            return View(ProductToBeEdited);
-        }
-        [HttpPost]
-        public IActionResult Edit(Product ProductToBeEdited)
-        {
-            if (ModelState.IsValid)
-            {
-                _UnitOfWork.Product.Update(ProductToBeEdited);
-                _UnitOfWork.Save();
-                TempData["success"] = "Product updated successfully!";
-                return RedirectToAction("Index");
-            }
-            return View();
+                productVM.CategoryList = _UnitOfWork.Category.GetAll().Select(
+                u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString(),
+                });
+				return View(productVM);
+			}
         }
         public IActionResult Delete(int Id)
         {
