@@ -22,16 +22,16 @@
 			<thead>
 				<tr>
 					<th>
-						Product Title
+						Title
 					</th>
 					<th>
-						Product Description
+						Author
 					</th>
 					<th>
-						Product Author
+						Price
 					</th>
 					<th>
-						Product Price
+						Category
 					</th>
 				</tr>
 			</thead>
@@ -39,9 +39,9 @@
 			{
 				<tr>
 					<td>@p.Title</td>
-					<td>@p.Description</td>
 					<td>@p.Author</td>
 					<td>@p.ListPrice</td>
+					<td>@p.Category.Name</td>
 					<td>
 						<div class="w-75 btn-group" role="group">
 							<a asp-controller="Product" asp-action="Upsert" asp-route-Id="@p.Id" class="btn btn-primary mx-2">
