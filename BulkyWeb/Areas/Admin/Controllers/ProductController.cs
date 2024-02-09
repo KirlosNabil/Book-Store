@@ -88,32 +88,6 @@ namespace BulkyWeb.Areas.Admin.Controllers
 				return View(productVM);
 			}
         }
-        public IActionResult Delete(int Id)
-        {
-            if (Id == 0)
-            {
-                return NotFound();
-            }
-            Product ProductToBeEdited = _UnitOfWork.Product.Get(u => u.Id == Id);
-            if (ProductToBeEdited == null)
-            {
-                return NotFound();
-            }
-            return View(ProductToBeEdited);
-        }
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteProduct(int? Id)
-        {
-            Product? ProductToBeDeleted = _UnitOfWork.Product.Get(u => u.Id == Id);
-            if (ProductToBeDeleted == null)
-            {
-                return NotFound();
-            }
-            _UnitOfWork.Product.Remove(ProductToBeDeleted);
-            _UnitOfWork.Save();
-            TempData["success"] = "Product deleted successfully!";
-            return RedirectToAction("Index");
-        }
 
         #region API CALLS
 
@@ -122,6 +96,26 @@ namespace BulkyWeb.Areas.Admin.Controllers
         {
             List<Product> ProductList = _UnitOfWork.Product.GetAll(includeProperties: "Category").ToList();
             return Json(new {data =  ProductList});
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int? Id)
+        {
+            Product ProductToBeDeleted = _UnitOfWork.Product.Get(u => u.Id == Id);
+            if(ProductToBeDeleted == null)
+            {
+                return Json(new {success = false, message = "Error while deleting"});
+            }
+
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, ProductToBeDeleted.ImageUrl.Trim('\\'));
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
+            _UnitOfWork.Product.Remove(ProductToBeDeleted);
+            _UnitOfWork.Save();
+            return Json(new { success = true, message = "Deleted successfully!" });
         }
 
         #endregion
