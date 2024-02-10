@@ -51,7 +51,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath, @"images\product");
-                    if(string.IsNullOrEmpty(productVM.Product.ImageUrl))
+                    if(!string.IsNullOrEmpty(productVM.Product.ImageUrl))
                     {
                         var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.Trim('\\'));
                         if(System.IO.File.Exists(oldImagePath))
@@ -68,13 +68,14 @@ namespace BulkyWeb.Areas.Admin.Controllers
                 if(productVM.Product.Id == 0)
                 {
                     _UnitOfWork.Product.Add(productVM.Product);
+                    TempData["success"] = "Product created successfully!";
                 }
                 else
                 {
 					_UnitOfWork.Product.Update(productVM.Product);
-				}
+                    TempData["success"] = "Product updated successfully!";
+                }
                 _UnitOfWork.Save();
-                TempData["success"] = "Product created successfully!";
                 return RedirectToAction("Index");
             }
             else
