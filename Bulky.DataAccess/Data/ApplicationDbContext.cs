@@ -19,6 +19,8 @@ namespace Bulky.DataAccess.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ShoppingCart>().Property(d => d.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<ShoppingCart>().HasKey(e => e.Id);
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, DisplayOrder = 1, Name = "ShortStories" },
                 new Category { Id = 2, DisplayOrder = 2, Name = "Romantic" },
