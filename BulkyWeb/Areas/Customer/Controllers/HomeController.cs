@@ -21,12 +21,6 @@ namespace BulkyWeb.Areas.Customer.Controllers
         }
         public IActionResult Index()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            if(userId != null)
-            {
-                HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId.Value).Count());
-            }
             IEnumerable<Product> products = _unitOfWork.Product.GetAll(includeProperties:"Category");
             return View(products);
         }
